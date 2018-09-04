@@ -1,0 +1,120 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+ var vm = new Vue({
+    el: "#notifications",
+    data: {
+      users: <%= @assignment.not_responded_user_data(@assignment).to_json.html_safe %>,
+      messages: <%= @assignment.list_notifications.to_json.html_safe %>,
+      isOpen: {},
+      errors:[],
+      validation_ok: true,
+      names: '',
+      subject: '',
+      body: '',
+      to_no_of_rows: 1,
+      send_disabled: true
+    },
+    methods: {
+      toggle: function(message) {
+        this.isOpen[message] = this.isOpen[message] == undefined ? true : !this.isOpen[message]
+        this.$forceUpdate();
+      },
+      expanded: function(message) {
+        return this.isOpen[message] == undefined ? false : this.isOpen[message]
+      },
+      user_names: function() {
+      for (var hashIdx in this.users) {
+          var user = this.users[hashIdx]
+          this.names += user.first_name + " " + user.last_name + ";"
+       }
+      },
+      calculate_no_of_rows: function () {
+        this.to_no_of_rows = Math.floor(this.users.length/8);
+      },    
+      user_lms_ids: function() {
+      var lms_ids = [];
+      for (var hashIdx in this.users) {
+          var user = this.users[hashIdx]
+          lms_ids.push(user.lms_id);
+       }
+       return lms_ids.join(" ");
+      },
+      form_submit: function(event) {
+        this.check_validation(event);
+        if(this.validation_ok) this.create_conversation(event);
+        event.preventDefault();
+      },
+      check_validation: function(event) {
+        this.validation_ok = true;
+        if((this.subject.trim().length > 0) && (this.body.trim().length > 0)) return true;
+        this.errors = [];
+        if(this.subject.trim().length == 0) {
+          this.errors.push("Please enter subject.");
+          this.validation_ok = false;
+        }
+        if(this.body.trim().length == 0) {
+          this.errors.push("Please enter message.");
+          this.validation_ok = false;
+        }
+      },
+      create_conversation: function(event) {
+        var that = this;
+        that.errors = [];
+        that.send_disabled = true;
+        $.ajax({
+          type: "POST",
+          url:  "/notifications/create_conversation",
+          data: {
+            "authenticity_token": AUTH_TOKEN,
+            "subject":            this.subject,
+            "body":               this.body,
+            "users_lms_ids":      this.user_lms_ids()
+          }
+        }).done(function(response) {
+          that.$notify({
+            type: 'success',
+            icon: '',
+            content: 'Notification sent successfully.'
+          })
+          that.messages.unshift.apply(that.messages, response);
+          that.subject = '';
+          that.body = '';
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          that.$notify({
+            type: 'danger',
+            icon: '',
+            title: 'Something went wrong',
+            content: 'Please try again or contact MyUni Support.'
+          })
+        });
+      },
+      check_send_disabled: function() {
+        if((this.subject.trim().length > 0) && (this.body.trim().length > 0)) this.send_disabled = false;
+        else
+          this.send_disabled = true;
+      }
+    },
+    beforeMount: function() {
+      this.check_send_disabled();
+      this.user_names();
+      this.calculate_no_of_rows();
+    }
+  });
+</script>

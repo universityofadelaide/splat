@@ -1,0 +1,4 @@
+canvas:
+  base_url: https://my_canvas_instance/
+  api_prefix: api/v1/
+  token: ENTER_ME

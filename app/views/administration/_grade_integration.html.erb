@@ -1,0 +1,32 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<h3>Select a base assignment</h3>
+<p>A base assignment is the one that you would like to apply the PAF score from this SPLAT assignment to, e.g. the group/project work. By doing this, <strong>the SPLAT assignment column in the Gradebook</strong> will automatically be updated by multiplying the PAF score to the selected base assignment for every student.</p>
+<p>This action can happen multiple times as needed during the moderation process.</p>
+<div id="grade_integration">
+  <select v-model="selected_assignment" class="form-control">
+  <option selected disabled value="">Select a Base Assignment</option>
+    <option v-for="assignment in assignments" v-bind:value="assignment.id">
+      {{ assignment.name }}
+    </option>
+  </select>
+
+  <button v-on:click="applyPAF" v-bind:disabled="selected_assignment == ''" class="btn btn-primary">Apply</button>
+</div>
+<%= render("administration/grade_integration_vue") %>

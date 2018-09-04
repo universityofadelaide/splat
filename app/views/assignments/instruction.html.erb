@@ -1,0 +1,70 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<%= render("shared/tabs") %>
+<div class="tab-content">
+  <div id="assignment_details" class="tab-pane fade in active">
+    <div id="questionmanager">
+      <div class="additional-margin--bottom"><h3 class="instructions">Instructions</h3> (Max 5000 characters)</div>
+        <%= form_for "/assignments" do |f| %>
+          <div><%= text_area(:instructions, :text, value: @assignment.instructions, rows: 8, maxlength: 5000) %></div>
+          <div class="additional-margin--bottom"><h3>Category and question criteria</h3>Select the default question(s) you want to use in the assignment. You may also add custom question(s) by dragging it to the appropriate category.</div>
+          <div id="main">
+            <div class="category" v-for="(elements, category) in questions">
+              <h3>{{categories[category]}}</h3>
+              <draggable v-model="questions[category]" class="questions" v-bind:options="category_options(category)" v-bind:move="moving">
+                <div v-for="(element, index) in questions[category]" class="question">
+                  <span class="left-box"><span class="ui-icon ui-icon-grip-dotted-vertical"></span></span>
+                  <span v-if="element.predefined" class="right-box">
+                    <input id="enabled_question" type="checkbox" class="predefined-question" v-model="element.enabled" />
+                  </span>
+                  <span v-else class="right-box">
+                    <button type="button" class="remove-question" v-on:click="remove(category, index)"><span class="ui-icon ui-icon-trash"></span></button>
+                  </span>
+                  <div v-if="element.predefined" class="questiontext" v-bind:class="{ 'disabled-predefined-question': !element.enabled }">
+                    <span>{{element.question_text}}</span>
+                  </div>
+                  <div v-else class="questiontext">
+                    <textarea class="editable-question" v-model="element.question_text" maxlength="1000" rows="4"> </textarea>
+                  </div>
+                </div>
+              </draggable>
+            </div>
+            <div class="category">
+              <draggable v-model="new_question" class="new_question" v-bind:options="{group:{
+                  name: 'new_question'
+                }}">
+                <div v-for="element in new_question" class="question">
+                  <span class="left-box"><span class="ui-icon ui-icon-grip-dotted-vertical left-box"></span></span>
+                  <span class="right-box"></span>
+                  <div class="questiontext">
+                    <textarea class="new-question" v-model="element.question_text" placeholder="Enter custom question here..." maxlength="1000" rows="4"> </textarea>
+                  </div>
+                </div>
+               </draggable>
+            </div>
+            <%= hidden_field_tag('updated_questions', '', { "v-model" => "JSON.stringify(questions)" }) %>
+          </div>
+          <%= f.submit("Save", id: "save_and_continue", class: "btn btn-default button-float--right", "v-bind:disabled": "!hasQuestionEnabled || hasUncategorisedQuestion") %>
+        <%- end -%>
+      </div>
+      <%= render("assignments/questionmanager_vue") %>
+  </div>
+  <%= render("shared/no_results") %>
+</div>
+

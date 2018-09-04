@@ -1,0 +1,113 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+ var vm = new Vue({
+    el: "#groupcategories",
+    data: {
+      categories: <%= @group_categories.to_json.html_safe %>,
+      selected: '',
+      categories_data: {},
+      errors: [],
+      show_modal: false,
+      save_and_complete: false,
+      disable_confirm: false,
+      group_count: 0
+    },
+    methods: {
+      getGroupData: function() {
+        this.save_and_complete = false
+        this.errors = []
+        var that = this
+        $.ajax({
+          url: "/group_categories/" + this.selected + ".json"
+        }).done(function(groups_json) {
+          that.categories_data = groups_json
+          if (that.categories_data.length == 0) {
+            that.errors.push("There are no groups in this group set.")
+          }
+          that.group_count = groups_json.length
+          for (var index in that.categories_data) {
+            that.getGroupMembers(that.categories_data[index]["id"], index)
+          }
+          that.$forceUpdate()
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          that.errors.push(jqXHR.responseText)
+        });
+      },
+      getGroupMembers: function(id, index) {
+        var that = this
+        $.ajax({
+          url: "/groups/" + id + ".json"
+        }).done(function(people_json) {
+          that.group_count--
+          that.addMembersData(people_json, index)
+          if (that.group_count == 0) {
+            that.verifyData()
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          that.errors.push(jqXHR.responseText)
+        });
+      },
+      verifyData: function() {
+        var user_count = 0
+        for (var index in this.categories_data) {
+          user_count += this.categories_data[index].members.length
+        }
+        if (user_count == 0) {
+          this.errors.push("There is no group data in the selected group set. Please set them up in 'People'.")
+          return
+        }
+        this.save_and_complete = true
+      },
+      addMembersData: function(data, index) {
+        this.categories_data[index]["members"] = data
+        this.$forceUpdate()
+      },
+      toggleMembers: function(group) {
+        group.expanded = group.expanded == undefined ? true : !group.expanded
+        this.$forceUpdate()
+      },
+      expanded: function(expanded) {
+        return expanded == undefined ? false : expanded
+      },
+      allExpanded: function() {
+        for (var group in this.categories_data) {
+          if (!this.expanded(this.categories_data[group].expanded)) {
+            return false
+          }
+        }
+        return true
+      },
+      toggleAll: function() {
+        var expand = true
+        if (this.allExpanded()) {
+          expand = false
+        }
+        for (var group in this.categories_data) {
+          this.categories_data[group].expanded = expand
+        }
+        this.$forceUpdate()
+      },
+      submitForm: function() {
+        this.disable_confirm = true
+        $("form").submit();
+      }
+    }
+  });
+</script>

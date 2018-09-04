@@ -1,0 +1,109 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+ var vm = new Vue({
+    el: "#questionmanager",
+    data: {
+      categories: {
+        <%= list_categories.html_safe %>
+      },
+      questions: <%= params.include?(:updated_questions) ? params[:updated_questions].html_safe : list_questions.html_safe %>,
+      new_question: [{
+        question_text: "",
+        id: null,
+        predefined: false,
+        enabled: true
+      }],
+      hasQuestionEnabled: false,
+      hasUncategorisedQuestion: false
+    },
+    computed: {
+      questionEnabled: function() {
+        // verifies if a question is enabled
+        for (var category in this.questions) {
+          if (this.questions.hasOwnProperty(category)) {
+            var questionArray = this.questions[category]
+            for (var i = 0; i < questionArray.length; i++) {
+              if (questionArray[i]["enabled"]) {
+                // we have found a enabled question
+                this.hasQuestionEnabled = true
+                return
+              }
+            }
+          }
+        }
+        // we don't have a single enabled question
+        this.hasQuestionEnabled = false
+      },
+      uncategorisedQuestion: function() {
+        this.hasUncategorisedQuestion = this.new_question[0]["question_text"] !== ""
+      }
+    },
+    methods: {
+      moving: function(evt) {
+        // predefined questions can't change categories
+        return !evt.draggedContext.element.predefined || (evt.from == evt.to)
+      },
+      remove: function(category, index) {
+        this.questions[category].splice(index, 1)
+      },
+      category_options: function(category) {
+        // defines how categories can be populated, all categories except new_question
+        // can be populated from every other category
+        put_categories = Object.keys(this.categories)
+        put_categories.push("new_question")
+        options = {
+          group: {}
+        }
+        options.group["name"] = category
+        options.group["put"] = put_categories
+
+        return options
+      }
+    },
+    watch: {
+      new_question: {
+        handler: function() {
+          // always keep a question in the new_question category
+          if (!this.new_question.length) {
+            this.new_question.push({
+              question_text: "",
+              id: null,
+              predefined: false,
+              enabled: true
+            })
+          } else {
+            this.uncategorisedQuestion
+          }
+        },
+        deep: true
+      },
+      questions: {
+        // if anything in the questions object changes re-evaluate if a question is enabled
+        handler: function() {
+          this.questionEnabled
+        },
+        deep: true
+      }
+    },
+    mounted: function() {
+      this.questionEnabled
+    }
+  });
+</script>

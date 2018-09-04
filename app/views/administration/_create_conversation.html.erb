@@ -1,0 +1,85 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<h3>Notify non-submitted students</h3>
+<span>Use this feature to send a MyUni notification to students who haven't completed the SPLAT assignment.</span>
+<div id="notifications">
+  <div class="non-submitted-students">
+    <%= form_tag({ controller: "notifications", action: "create_conversation" }, method: "post") do |f| %>
+      <table class="table" id="notify">
+        <tr>
+          <td colspan="2">
+            <div class="flash-messages" v-cloak>
+              <div class="alert alert-danger" v-for="error in errors">{{ error }}</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="to">To</td>
+          <td>
+             <textarea class="to-content" v-model="names" v-bind:rows="to_no_of_rows" cols="100%" disabled="disabled"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="subject">Subject</td>
+          <td>
+            <input type="text" name="subject" id="subject" v-model="subject" placeholder="Enter subject..." maxlength="255" size="100%" v-on:keyup="check_send_disabled" class="subject-content">
+          </td>
+        </tr>
+        <tr>
+          <td class="message">Message</td>
+          <td>
+            <textarea id="body" name="body" v-model="body" rows="8" maxlength="5000" cols="100%" placeholder="Enter message..." v-on:keyup="check_send_disabled" class="message-content"> </textarea>
+          </td>
+        </tr>
+        <%= hidden_field_tag("users_lms_ids", { "v-model" => "user_lms_ids()" }) %>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <button class="btn btn-primary button-float--right" v-on:click="form_submit" v-bind:disabled="send_disabled">Send</button>
+         </td>
+        </tr>
+      </table>
+    <%- end -%>
+  </div>
+  <div class="history" >
+    <h3>History</h3>
+    <hr>
+    <span v-if="messages.length > 0">
+      <ul id="groups_list" class="groups_list unstyled">
+        <li class="group-border--bottom" v-model="messages" v-for="(message_info, index) in messages">
+          <div class="group_info">
+            <div class="group_header" v-on:click="toggle(index)">
+              <div class="indicator glyphicon" v-bind:class="[expanded(index) ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-right']">
+              </div>
+              <span>{{ message_info.created_at }} - {{ message_info.subject }}</span>
+              <div class="student_sent">{{ message_info.no_of_users_sent }} students</div>
+            </div>
+            <div v-show="expanded(index)">
+              <div class="notified_users">{{ message_info.users.join(";") }}</div>
+              <div>{{ message_info.body }}</div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </span>
+    <span v-else>No notification has been sent for this Assignment.
+    </span>
+  </div>
+</div>
+<%= render("administration/create_conversation_vue") %>

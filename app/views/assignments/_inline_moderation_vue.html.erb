@@ -1,0 +1,237 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+ Vue.use(window.uiv)
+ var vm = new Vue({
+    el: "#inline-moderation",
+    data: {
+      groups: {},
+      isOpen: {},
+      limitSelected: 15,
+      limitOptions: _.range(10, 16),
+      loading: true,
+      splat: splat
+    },
+    computed: {
+      refresh: function() {
+        return this.splat.refresh
+      }
+    },
+    methods: {
+      toggle: function(group) {
+        this.isOpen[group] = this.isOpen[group] == undefined ? true : !this.isOpen[group]
+        this.$forceUpdate()
+      },
+      expanded: function(group) {
+        return this.isOpen[group] == undefined ? false : this.isOpen[group]
+      },
+      isHighlighted: function(group) {
+        highlighted = false
+        for (var studentIdx in group.data) {
+          var student = group.data[studentIdx]
+          for (var scoreIdx in student.scores) {
+            var score = student.scores[scoreIdx]
+            if (this.isScoreHighlighted(student.scores, student.student_id, score)) {
+              score.highlighted = true
+              highlighted = true
+            } else if (_.isObject(score)) {
+              score.highlighted = false
+            }
+          }
+        }
+        return highlighted
+      },
+      isScoreHighlighted: function(scores, forUserId, scoreObj) {
+        if (_.isArray(scores) && _.isObject(scoreObj)) {
+          totalScoreFromPeers = 0
+          completed = 0
+          score = scoreObj.score
+
+          for (var hashIdx in scores) {
+            var hash = scores[hashIdx]
+            if (!_.isNull(hash) && hash.from != forUserId) {
+              totalScoreFromPeers += hash.score
+              completed++
+            }
+          }
+
+          if (completed !== 0) {
+            ratio = score / (totalScoreFromPeers / completed)
+            lowerLimit = 1 - (this.limitSelected / 100)
+            upperLimit = 1 + (this.limitSelected / 100)
+            return ratio < lowerLimit || ratio > upperLimit
+          } else {
+            return false
+          }
+        } else {
+          return false
+        }
+      },
+      cssScoreClasses: function(scoreObj) {
+        classes = []
+        if (_.isObject(scoreObj)) {
+          classes.push('has_score')
+          if (!scoreObj.used) {
+            classes.push('not_used')
+          }
+          if (scoreObj.highlighted) {
+            classes.push('highlight')
+          }
+        }
+        return classes.join(" ")
+      },
+      toggleScoreState: function(scoreObj, student, group) {
+        if (_.isObject(scoreObj)) {
+          var that = this
+          $.ajax({
+            type:     "PUT",
+            url:      "/responses/score",
+            dataType: "json",
+            data: {
+              "authenticity_token": AUTH_TOKEN,
+              "from":               scoreObj.from,
+              "for":                scoreObj.for,
+              "used":               !scoreObj.used
+            }
+          }).done(function(json) {
+            scoreObj.used = json.params.used == "true"
+            student.new_paf_score = json.paf_score
+            student.new_sapa_score = json.sapa_score
+            student.isModerated = that.hasModeratedScores(student)
+            group.isModerated = that.isModerated(group)
+            that.$notify({
+              type: 'success',
+              icon: '',
+              content: 'Saved.'
+            })
+          }).fail(function(jqXHR, textStatus, errorThrown) {
+            that.$notify({
+              type: 'danger',
+              icon: '',
+              title: 'Something went wrong',
+              content: 'Please try again or contact MyUni Support.'
+            })
+          });
+        }
+      },
+      isModerated: function(group) {
+        var result = false
+        for (var studentIdx in group.data) {
+          var student = group.data[studentIdx]
+          student.isModerated = this.hasModeratedScores(student)
+          if (student.isModerated) {
+            result = true
+          }
+        }
+        return result
+      },
+      hasModeratedScores: function(student) {
+        for (var scoreIdx in student.scores) {
+          var score = student.scores[scoreIdx]
+          if (_.isObject(score)) {
+            if (!score.used) {
+              return true
+            }
+          }
+        }
+        return false
+      },
+      fullName: function(data) {
+        return data.student_first_name + " " + data.student_last_name
+      },
+      limitChange: function() {
+        var groupExpanded = false
+        var firstGroupIdx = null
+        for (var groupIdx in this.groups) {
+          if (_.isNull(firstGroupIdx)) {
+            firstGroupIdx = groupIdx
+          }
+          var group = this.groups[groupIdx]
+          group.isModerated = this.isModerated(group)
+          group.highlighted = this.isHighlighted(group)
+          if (group.highlighted && !group.isModerated && !groupExpanded) {
+            this.isOpen[groupIdx] = true
+            groupExpanded = true
+          }
+        }
+        if (!_.includes(_.values(this.isOpen), true)) {
+          this.isOpen[firstGroupIdx] = true
+        }
+      }
+    },
+    filters: {
+      truncate: function(text, stop, postfix){
+        return text.slice(0, stop) + (stop > text.length ? '' : postfix || ' ...')
+      },
+      notAvailable: function(score){
+        return _.isNull(score) ? "n/a" : score
+      }
+    },
+    watch: {
+      refresh: function() {
+        var that = this
+        this.loading = true
+        $.ajax({
+          type:     "GET",
+          url:      "/assignments/moderation",
+          dataType: "json",
+        }).done(function(json) {
+          that.loading = false
+          that.groups = json
+          that.limitChange()
+          var title = $("#results_buttons a").data("original-title")
+          var count = 0
+          for (var groupIdx in that.groups) {
+            count += that.groups[groupIdx]["total_students_responded"]
+          }
+          var newTitle = count + "/" + title.split("/")[1]
+          $("#results_buttons a").attr("title", newTitle).tooltip('fixTitle')
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          that.loading = false
+          that.$notify({
+            type: 'danger',
+            icon: '',
+            title: 'Unable to get updated moderation data (' + jqXHR.responseJSON.error  + ')',
+            content: 'Please try to refresh the page or contact MyUni Support.'
+          })
+        });  
+      }
+    },
+    beforeMount: function() {
+      var that = this
+      $.ajax({
+        type:     "GET",
+        url:      "/assignments/moderation",
+        dataType: "json",
+      }).done(function(json) {
+        that.loading = false
+        that.groups = json
+        that.limitChange()
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        that.loading = false
+        that.$notify({
+          type: 'danger',
+          icon: '',
+          title: 'Unable to get moderation data (' + jqXHR.responseJSON.error  + ')',
+          content: 'Please try again or contact MyUni Support.'
+        })
+      });
+    }
+  });
+</script>

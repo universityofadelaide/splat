@@ -1,0 +1,92 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<div id="inline-moderation">
+  <%= form_for("/assignments") do |f| %>
+    <div id="limit">Limit:
+     <select v-model="limitSelected" v-on:change="limitChange">
+      <option v-for="option in limitOptions" v-bind:value="option">{{ option+"%" }}</option>
+     </select>
+     <div class="notes">
+       <h5>Note: You can adjust the "Limit" to allow for deviations from the optimal value 1.0 for the individual PAF scores.</h5>
+       <h5>Students outside this limit will be <span class="highlight">highlighted</span>.</h5>
+       <h5>You can choose to exclude a score for a student by clicking the score. This will automatically recalculate a NEW PAF and NEW SAPA for the student.</h5>
+     </div>
+    </div>
+    <div v-if="loading">Loading data ... Please wait ...</div>
+    <ul id="groups_list" class="groups_list unstyled">
+      <li class="group-border--bottom" v-for="(groupInfo, groupName) in groups">
+          <div class="group_info">
+            <div class="group_header" v-bind:class="[groupInfo.highlighted ? 'highlight' : '']" v-on:click="toggle(groupName)">
+              <div class="indicator glyphicon" v-bind:class="[expanded(groupName) ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-right']"></div>
+              <span>{{ groupName }} <span v-if="groupInfo.isModerated" class="moderated">(moderated)</span></span>
+              <div class="student_completed">{{ groupInfo['total_students_responded'] }} / {{groupInfo['total_student']}} completed</div>
+            </div>
+            <div v-show="expanded(groupName)">
+              <table class="table table-striped table-bordered students_group">
+                <thead>
+                  <tr>
+                    <th rowspan="2" class="student_name">Student</th>
+                    <th rowspan="2" class="scores">PAF</th>
+                    <th rowspan="2" class="scores">NEW PAF</th>
+                    <th rowspan="2" class="scores">SAPA</th>
+                    <th rowspan="2" class="scores">NEW SAPA</th>
+                    <th id="markers_list" class="table-cell--center" v-bind:colspan="groupInfo['data'].length"> Total Marks Assigned By Peers</th>
+                    <th rowspan="2" class="comments">Student Comment</th>
+                  </tr>
+                  <tr>
+                     <th class="table-cell--center" v-for="studentData in groupInfo['data']">
+                      <span v-if="fullName(studentData).length > 18" v-tooltip.top="fullName(studentData)">{{ fullName(studentData) | truncate(18) }}</span>
+                      <span v-else>{{ fullName(studentData) }}</span>
+                     </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="studentData in groupInfo['data']">
+                    <td v-if="fullName(studentData).length > 18" v-tooltip.right="fullName(studentData)">{{ fullName(studentData) | truncate(18) }}</td>
+                    <td v-else>{{ fullName(studentData) }}</td>
+                    <td class="table-cell--center">{{ studentData.paf_score }}</td>
+                    <td class="table-cell--center">
+                      <span v-if="studentData.isModerated">{{ studentData.new_paf_score | notAvailable }}</span>
+                    </td>
+                    <td class="table-cell--center">{{ studentData.sapa_score }}</td>
+                    <td class="table-cell--center">
+                      <span v-if="studentData.isModerated">{{ studentData.new_sapa_score | notAvailable }}</span>
+                    </td>
+                    <td
+                      class="table-cell--center score"
+                      v-for="scoreObj in studentData.scores"
+                      v-bind:class="cssScoreClasses(scoreObj)"
+                      v-on:click="toggleScoreState(scoreObj, studentData, groupInfo)"
+                    >
+                      {{ _.isObject(scoreObj) ? scoreObj.score : "" }}
+                    </td>
+                    <td v-if="studentData.comment.length > 0" v-popover.left="{title:'Student Comment', content: studentData.comment}">
+                      {{ studentData.comment | truncate(15) }}
+                    </td>
+                    <td v-else>&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </li>
+    </ul>
+  <%- end -%>
+</div>
+<%= render("assignments/inline_moderation_vue") %>

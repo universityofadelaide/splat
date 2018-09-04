@@ -1,0 +1,86 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+ Vue.use(window.uiv)
+ var vm = new Vue({
+    el: "#clear-attempts",
+    data: {
+      responses: <%= @assignment.users_responded.to_json.html_safe %>,
+      search_text: "",
+      splat: splat,
+      show_modal: false,
+      selected_user: { name: "", user_id: "" },
+      send_message: false,
+      message: ""
+    },
+    computed: {
+      filteredResponses: function () {
+        var that = this
+        if(this.search_text.trim().length >= 3)
+        {
+          return this.responses.filter(function (response) 
+          {
+            var searchtext = that.search_text.trim().toLowerCase()
+            return (_.includes(response["login_id"].toLowerCase(), searchtext) || _.includes(response["name"].toLowerCase(), searchtext))
+          });
+        }
+      }
+    },
+    methods: {
+      displayWarning: function(user) {
+        this.selected_user = user
+        this.show_modal = true
+      },
+      clearResponses: function() {
+        var that = this
+        $.ajax({
+          type:     "DELETE",
+          url:      "/responses/delete",
+          dataType: "json",
+          data: {
+            authenticity_token: AUTH_TOKEN,
+            user_id:            that.selected_user["id"],
+            send_message:       that.send_message,
+            message:            that.message
+          }
+        }).done(function(json) {
+          _.remove(that.responses, function(obj) {
+            return obj.id == that.selected_user.id
+          })
+          that.responses = that.responses.slice(0)
+          that.show_modal = false
+          that.splat["refresh"] = Date.now()
+          that.$notify({
+            type: 'success',
+            icon: '',
+            content: 'Responses deleted.'
+          })
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+          that.show_modal = false
+          that.$notify({
+            type: 'danger',
+            icon: '',
+            title: 'Something went wrong',
+            content: 'Please try again or contact MyUni Support.'
+          })
+        });
+      }
+    }
+  });
+</script>

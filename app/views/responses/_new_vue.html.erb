@@ -1,0 +1,96 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<script>
+  Vue.component('response-questions', { props: ['responseQuestion'] });
+  Vue.component('questions', { props: ['studentQuestions'] });
+  Vue.component('score-counter', { props: ["remainingScore", "count"] });
+  Vue.component('submit', { props: ['disabled'] });
+  Vue.component('student-score', { props: ['score', 'question', 'name', 'id'] });
+
+  Vue.use(window.uiv)
+  var vm = new Vue({
+    el: "#student_responses_page",
+    data: {
+      response_questions: <%= response_question_list.to_json.html_safe %>,
+      total: 100,
+      disableSubmit: true
+    },
+    methods: {
+      isNumber: function(value) {
+        var isNumber = new RegExp('^\\d+$'); // only positive numbers, can be 0 but not empty
+        return isNumber.test(value);
+      },
+      calculate: function (question_id, that) {
+        scores = document.getElementById('question-' + question_id).getElementsByTagName('input');
+        $this = $('#'+ that.target.id);
+   
+        if (scores.length === 0 || (this.isNumber(that.target.value) && parseInt(that.target.value) <= this.total)) {
+          $this.removeClass("input-error");
+          $this.parent("div").children("span.error").remove();
+        }
+        else {
+          if (that.target.parentElement.getElementsByClassName("points error").length == 0) {
+            $this.addClass("input-error");
+            $this.after("<span class='points error'>Please enter a whole number between 0 and 100 inclusive.</span>")
+          }
+        }
+        this.validateResponse();
+      },
+      validateResponse: function() {
+        var i,j,k;
+        var isValid=true;   
+
+        response_questions_loop: 
+        for(i=0; i < this.response_questions.length; i++){
+          for(j=0; j < this.response_questions[i].student_questions.length; j++) {
+            var count = 0;
+            var ok = true;
+
+            for (k=0; k< this.response_questions[i].student_questions[j].students.length; k++){
+              score = this.response_questions[i].student_questions[j].students[k].score;
+              if (this.isNumber(score)) {
+                count += parseInt(score);
+              }
+              else {
+                ok = false;
+                break;
+              }
+            }
+            if (!isValid) {
+              break response_questions_loop;
+            }
+            isValid = ok && count == this.total;
+          }
+        }
+        this.disableSubmit = isValid ? false : true;
+      },
+      reamainingPointAllocation: function(question) {
+        var count=0;
+        var i;
+
+        for (i=0; i< question.students.length; i++){
+          if (this.isNumber(question.students[i].score)) {
+            count += parseInt(question.students[i].score);
+          }
+        }
+        return this.total - count;
+      }
+    }
+  });
+</script>

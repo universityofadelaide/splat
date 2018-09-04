@@ -1,0 +1,98 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<div id="student_responses_page">
+  <%- if @assignment.instructions.present? %>
+    <%= simple_format(@assignment.instructions).html_safe %>
+    <hr>
+  <%- end %>
+  <div>
+  <%= form_tag({controller: "responses", action: "create"}, method: "post") do |f| %>
+    <response-questions
+      v-for="response_question in response_questions"
+      v-bind:response-question="response_question"
+      inline-template>
+      <div>
+        <h3 class="category-margin--top">
+          {{ response_question.category_name }}
+        </h3>
+        <questions
+          v-bind:student-questions="response_question.student_questions"
+          inline-template>
+          <ol>
+            <li v-for="student_question in studentQuestions"
+              v-bind:id="'question-' + student_question.question.id"
+              class="question question-margin--top question-student">
+              <h4 class="heading">{{ student_question.question.question_text }}</h4>
+              <score-counter
+                v-bind:id="'rs-' + student_question.question.id"
+                v-bind:remaining-score="reamainingPointAllocation(student_question)"
+                inline-template>
+                <span v-if="remainingScore < 0" class="counter error">
+                  {{ (remainingScore * -1)  + total }} / {{ total }} Over-allocated
+                </span>
+                <span v-else-if="remainingScore <= total && remainingScore > 0" class="counter error">
+                  {{ remainingScore }} / {{ total }} Points remaining
+                </span>
+                <span v-else="remainingScore == total" class="counter">
+                  {{ total }} / {{ total }} Points allocated
+                </span>
+              </score-counter>
+              <div>
+                <div v-for="student in student_question.students">
+                  <span class="name">{{ student.first_name }} {{ student.last_name }}</span>
+                  <student-score
+                    v-bind:question="student_question.question.id"
+                    v-bind:id="'questions_' + student_question.question.id + '_responses_' + student.id + '_score'"
+                    v-bind:name="'questions[' + student_question.question.id + '][responses[' + student.id + '][score]]'"
+                    inline-template>
+                    <div class="score">
+                      <input 
+                        v-model="student.score" 
+                        v-on:change="calculate(student_question.question.id, $event)"
+                        v-bind:name="name"
+                        v-bind:id="id" 
+                        type="number" min="0" max="100" class="input-score" />
+                    </div>
+                  </student-score>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </questions>
+      </div> 
+    </response-questions>
+    <h3 class="margin--top">Comments</h3>
+    <div class="additional-margin--bottom">Please justify if you have scored particular student(s) higher or lower than the rest of the team, or provide any general comments you'd like to. (Max 3000 characters) </div>
+    <div><%= text_area(:comments, :text ,cols: "100%", rows: 8, maxlength: 3000) %></div> 
+    <hr>
+    <submit 
+      v-bind:disabled="disableSubmit"
+      inline-template>
+      <div>
+        <input id="Save_responses" :disabled="disabled" class="btn btn-default button-float--right submit_responses" type="submit" value="Submit Responses" />
+        <div v-if="disabled" 
+          id="before_submit">
+          All students must be given points between 0 and 100 inclusive
+        </div>
+      </div>
+    </submit>
+  <%- end %>
+</div>
+
+<%= render("responses/new_vue") %>

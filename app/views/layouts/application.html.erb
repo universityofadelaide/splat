@@ -1,0 +1,63 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SPLAT - <%= @assignment_name %></title>
+    <%= csrf_meta_tags %>
+    <%= javascript_tag "var AUTH_TOKEN = '#{form_authenticity_token}';" if protect_against_forgery? %>
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.10/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uiv/0.21.2/uiv.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/15.0.0/vuedraggable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.min.js"></script>
+    <script>window.splat = { refresh: Date.now() }; </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="banner-parent">
+        <%= image_tag("splat.png", class: "banner-image") %>
+        <span class="appname">Self &amp; Peer Learning Assessment Tool</span>
+        <%- if learner?(session[:roles]) -%>
+          <%= Rails.configuration.x.app["learner_banner"].html_safe %>
+        <%- end -%>
+      </div>
+      <%- unless session[:launch_presentation_document_target] == "iframe" -%>
+      <h1><%= @assignment_name %></h1>
+      <%- end -%>
+      <hr/>
+      <%= display_flash_messages %>
+      <%= yield %>
+    </div>
+    <%- if Rails.configuration.x.app["google_analytics"]["use"] -%>
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= Rails.configuration.x.app["google_analytics"]["id"].html_safe %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments)};
+      gtag('js', new Date());
+
+      gtag('config', '<%= Rails.configuration.x.app["google_analytics"]["id"].html_safe %>');
+    </script>
+    <%- end -%>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+Rails:
+  Enabled: true
+
+AllCops:
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  Exclude:
+    - node_modules/**/* # JavaScript content (managed by yarn), if this dir doesn't exist it is quietly ignored.
+    - db/schema.rb # Auto-generated.
+    - Gemfile
+
+Style/Documentation:
+  Exclude:
+    - db/migrate/* # Migration names should be sufficiently descriptive.
+
+# Ruby 3.0+ optional feature, except rubocop expects that it has been opted-in, rubocop wants this at the top of every file:
+# frozen_string_literal: true
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# The default is too small
+Metrics/ClassLength:
+  Max: 400
+
+# The default is too small
+Metrics/BlockLength:
+  Max: 200
+
+# The default is too small
+Metrics/MethodLength:
+  Max: 100
+
+# The default is too small
+Metrics/LineLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Enabled: false
+
+# The default is too small
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+# The default is too small
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Layout/EmptyLinesAroundBlockBody:
+  Exclude:
+    - lib/tasks/*
+    - spec/**/*
+
+# There's nothing special about the first line in a class - force a line break to separate it from the class def (every other method etc is separated with a linebreak)
+Layout/EmptyLinesAroundClassBody:
+  EnforcedStyle: empty_lines
+
+# There's nothing special about the first line in a module - force a line break to separate it from the module def (every other method etc is separated with a linebreak)
+Layout/EmptyLinesAroundModuleBody:
+  EnforcedStyle: empty_lines
+
+# No space makes the method definition shorter and differentiates
+# from a regular assignment.
+Layout/SpaceAroundEqualsInParameterDefault:
+  EnforcedStyle: no_space
+
+# prefer spaces around expressions inside string interpolation
+Layout/SpaceInsideStringInterpolation:
+  EnforcedStyle: space
+
+# Indent to make it more obvious that it's a continuation of preceeding line(s)
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+# More interested in the method (than the dot) - indent to show the continutation of a chain over a line break
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+# Sometimes key, sometimes table - table is (slightly) more common (probably)
+Layout/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Style/EmptyMethod:
+  Enabled: false
+
+# Ruby 3.0+ optional feature, except rubocop expects that it has been opted-in, rubocop wants this at the top of every file:
+# frozen_string_literal: true
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# prefer consistant use of double quotes for strings
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# double quotes in strings inside interpolated expressions also
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# Remove some magic and be more explicit - prefer verbosity and clarity (forcing hashes to always have braces)
+Style/BracesAroundHashParameters:
+  EnforcedStyle: braces
+  Exclude:
+    - Rakefile
+    - config/routes.rb
+    - lib/tasks/datagen.rake
+
+# Sometimes "unless xyz", sometimes "if !xyz" - context typically determines which is easier to grok
+Style/NegatedIf:
+  Enabled: false
+
+# Remove some magic and be more explicit - prefer verbosity and clarity (if the author deems it worthwhile, however there's no way to enforce this)
+Style/RedundantReturn:
+  Enabled: false
+
+# Remove some magic and be more explicit (and Java-like) - prefer verbosity and clarity (if the author deems it worthwhile, however there's no way to enforce this)
+Style/RedundantSelf:
+  Enabled: false
+
+# The default of require_no_parentheses makes ternary's much harder to read (and more error-prone when operator precedence comes into play)
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses

@@ -1,0 +1,74 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<h3>Clear Attempts</h3>
+<%- if @assignment.number_of_students_completed == 0 -%>
+  <span>There are no students responses to be cleared yet.</span>
+<%- else -%>
+  <div>Use the below text box to send a notification (optional)</div>
+  <div id="clear-attempts">
+    <div id="send_message_container">
+      <input type="checkbox" v-model="send_message" />
+      <span>Send message</span>
+    </div>
+    <div>
+      <textarea class="" v-model="message" rows=5 cols="100%" maxlength="5000" v-bind:disabled="!send_message"></textarea>
+    </div>
+    <div id="search_container">
+      <div>Search a student via login ID or name, e.g. a1234567. A minimum of 3 characters has to be supplied.</div>
+      <span>
+        <input type="text" name="search" id="search" size="40" placeholder="Search students (at least 3 characters)" v-model="search_text" autocomplete="off" />
+      </span>
+    </div>
+    <div v-if="search_text.length >= 3" id="search_results">
+      <div v-if="filteredResponses.length">
+        <table class="results" class="table table-striped">
+          <thead>
+            <th>Login Id</th>
+            <th>Name</th>
+            <th>&nbsp;</th>
+          </thead>
+          <tbody>
+            <tr v-for="response in filteredResponses">
+              <td>{{ response["login_id"] }}</td>
+              <td>{{ response["name"] }}</td>
+              <td>
+                <button class="btn btn-primary button-float--right" @click="displayWarning(response)">Clear</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else>
+        No student found. Either the search parameter didn't result in a match or the student didn't respond yet.
+      </div>
+    </div>
+    
+    <modal title="Delete Responses" v-model="show_modal">
+      <div slot="default">
+        You are about to delete responses of user "{{ selected_user.name }}". This action can't be undone.
+      </div>
+      <div slot="footer">
+        <button type="button" class="btn btn-default" v-on:click="show_modal = false">Cancel</button>
+        <button class="btn btn-default" v-on:click="clearResponses()">Confirm</button>
+      </div>
+    </modal>
+
+  </div>
+  <%= render("administration/clear_attempts_vue") %>
+  <%- end -%>

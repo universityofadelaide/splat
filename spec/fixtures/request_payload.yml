@@ -1,0 +1,63 @@
+# parameters here were gotten from a real canvas request in the following way:
+# 1. Set up splat-int environment to have the consumer_key: "test" and the shared_secret: "secret"
+# 2. Configure canvas to point to splat-int
+# 3. ...
+# 8. delete "controller" and "action" from the params hash
+# 9. to_yaml the hash
+---
+:GOOD_REQUEST:
+  :host: splat-int.adelaide.edu.au
+  :path: "/assignments/lti_launch"
+  :scheme: https://
+  :client_secret: secret
+  :headers:
+    X-XSS-Protection: 1; mode=block
+    X-Content-Type-Options: nosniff
+  :params:
+    oauth_consumer_key: test
+    oauth_signature_method: HMAC-SHA1
+    oauth_timestamp: '1501026991'
+    oauth_nonce: urenckniZ9Ra4D0rGvJuYAyUKpmcQ4T4EXfdWJIAgq0
+    oauth_version: '1.0'
+    context_id: d28a4e89c6f47dc581a618ddb35eae638f33c1b6
+    context_label: AU_TA_TEST_0001
+    context_title: AU_UNIAD_TA_TEST_0001
+    custom_canvas_api_domain: adelaide.beta.instructure.com
+    custom_canvas_assignment_id: '43909'
+    custom_canvas_assignment_points_possible: '0'
+    custom_canvas_assignment_title: splat-int test assignment
+    custom_canvas_course_id: '27151'
+    custom_canvas_enrollment_state: active
+    custom_canvas_user_id: '9'
+    custom_canvas_user_login_id: a1093950
+    custom_canvas_workflow_state: available
+    ext_ims_lis_basic_outcome_url: https://adelaide.beta.instructure.com/api/lti/v1/tools/510/ext_grade_passback
+    ext_lti_assignment_id: e41b2022-8836-4ce0-aed6-f464a8a7c1e4
+    ext_outcome_data_values_accepted: url,text
+    ext_outcome_result_total_score_accepted: 'true'
+    ext_outcomes_tool_placement_url: https://adelaide.beta.instructure.com/api/lti/v1/turnitin/outcomes_placement/510
+    ext_roles: urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:instrole:ims/lis/Student,urn:lti:role:ims/lis/Instructor,urn:lti:sysrole:ims/lis/User
+    launch_presentation_document_target: iframe
+    launch_presentation_locale: en-GB
+    launch_presentation_return_url: https://adelaide.beta.instructure.com/courses/27151/external_content/success/external_tool_redirect
+    lis_course_offering_sourcedid: AU_TEACHING_TEST
+    lis_outcome_service_url: https://adelaide.beta.instructure.com/api/lti/v1/tools/510/grade_passback
+    lis_person_contact_email_primary: a1093950@adelaide.edu.au
+    lis_person_name_family: Malessa
+    lis_person_name_full: Niko Malessa
+    lis_person_name_given: Niko
+    lis_person_sourcedid: '1093950'
+    lti_message_type: basic-lti-launch-request
+    lti_version: LTI-1p0
+    oauth_callback: about:blank
+    resource_link_id: 718d39ebbb54bbf4cdb8c7bb88e0edabd2bc9535
+    resource_link_title: splat-int test assignment
+    roles: Instructor,urn:lti:instrole:ims/lis/Administrator
+    tool_consumer_info_product_family_code: canvas
+    tool_consumer_info_version: cloud
+    tool_consumer_instance_contact_email: notifications@instructure.com
+    tool_consumer_instance_guid: brjTnXnelSfPEosicuEqo8jssZIhA3DFvfFytnDx:canvas-lms
+    tool_consumer_instance_name: The University of Adelaide
+    user_id: 45536fbf7515db571ec4f665cae175cd12e005c3
+    user_image: https://secure.gravatar.com/avatar/9627f96c5db0f32e78e44970e69f2194?s=50&d=https%3A%2F%2Fcanvas.instructure.com%2Fimages%2Fmessages%2Favatar-50.png
+    oauth_signature: JaulyYlD1PlE1mn/hssZuHpVkzc=

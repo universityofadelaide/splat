@@ -1,0 +1,602 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require "jquery-ui"
+ */
+$btn-primary-color: #947106;
+$btn-primary-bg: #ffffff;
+$btn-default-bg: #eeeeee;
+$btn-default-color: #444444;
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+body {
+  font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 1.5;
+  color: #2d3b45;
+  margin: 6px 0;
+}
+
+.container {
+  width: 100%;
+  margin: auto;
+  padding-left: 2px;
+
+  .banner-parent {
+    position: relative;
+    text-align: left;
+    top: 0;
+    left: 0;
+    background-color: #eaeaea;
+    margin-top: 2px;
+    margin-bottom: 2px;
+
+    .appname {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .banner-link {
+      position: relative;
+      margin-right: 10px;
+      float: right;
+    }
+  }
+
+  h1,
+  h2 {
+    font-size: 1.8em;
+  }
+
+  h3 {
+    font-size: 1.5em;
+  }
+
+  .btn {
+    padding: 8px 14px;
+    border-color: #c7cdd1;
+  }
+
+  textarea {
+    max-width: 100%;
+  }
+
+  .questions {
+    margin-top: 5px;
+
+    .question-list {
+      margin-bottom: 10px;
+    }
+  }
+
+  .score {
+    display:inline;
+  }
+
+  table.students_group {
+    .score {
+      display: table-cell;
+    }
+  }
+
+  .button-float--right {
+    float: right;
+  }
+
+  .button-margin--right {
+    margin-right: 5px;
+  }
+
+  .additional-margin--bottom {
+    margin-bottom: 20px;
+  }
+
+  .question-margin--top {
+    margin-top: 20px;
+  }
+
+  .category-margin--top {
+    margin-top: 30px;
+  }
+
+  .margin--top {
+    margin-top: 40px;
+  }
+
+  .instruction-margin--top {
+    margin-top: 20px;
+  }
+
+  .label-text {
+    font-weight: bold;
+  }
+
+  .input-score {
+    padding: 6px;
+    margin-bottom: 8px;
+  }
+
+  .section {
+    display: contents;
+    width: 90%;
+  }
+
+  #instructions_text {
+    width: 100%;
+  }
+
+  #before_submit {
+    color: #ff0000;
+    font-weight: bold;
+    float: right;
+    margin: 5px 10px 0 0;
+  }
+
+  li.question {
+    h5 {
+      margin-bottom: 0;
+    }
+
+    input {
+      vertical-align: middle;
+    }
+
+    span.name {
+      display: inline-block;
+      vertical-align: middle;
+      width: 200px;
+      font-size: 14px;
+    }
+
+    .points {
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .error {
+      color: #ff0000;
+      font-weight: bold;
+    }
+
+    .counter {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .input-error {
+      border: 1px solid #ff0000;
+      margin: 1px;
+    }
+  }
+
+  #groups_panel > ul {
+    margin-bottom: 0;
+    padding: 0;
+  }
+
+  .group_members > ul {
+    margin-bottom: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  ol.unstyled,
+  ul.unstyled {
+    list-style: none;
+  }
+
+  select#group_categories {
+    padding: 5px 8px;
+    margin-bottom: 5px;
+  }
+
+  #groups_panel {
+    border-bottom: 1px solid #bbb;
+    margin-bottom: 20px;
+  }
+
+  #groups_header {
+    font-weight: bold;
+    margin: 5px 0;
+    padding: 5px 8px;
+  }
+
+  #show_hide_all {
+    cursor: pointer;
+    float: right;
+    font-weight: normal;
+  }
+
+  #show_hide_all:hover {
+    text-decoration-line: underline;
+  }
+
+  #groups_list {
+    padding-left: 0;
+  }
+
+  .groups_list::after {
+    content: "";
+    clear: both;
+    display: block;
+  }
+
+  .group {
+    border-top: 1px dashed #bbb;
+    margin: 5px 8px;
+  }
+
+  .group::after,
+  .group::before {
+    content: "";
+    clear: both;
+    display: block;
+  }
+
+  .group_header {
+    cursor: pointer;
+    font-weight: bold;
+    margin: 5px 0;
+    padding: 5px 8px;
+  }
+
+  .group_detail::after,
+  .group_detail::before {
+    content: "";
+    clear: both;
+    display: block;
+  }
+
+  .indicator {
+    margin-right: 8px;
+  }
+
+  .member_count {
+    margin: auto 35% auto auto;
+    float: right;
+    font-weight: normal;
+  }
+
+  .group_members {
+    margin: 0 0 0 32px;
+  }
+
+  .group_member {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    float: left;
+    margin: 0 2% 3px 0;
+    padding: 5px 8px;
+    width: 20em;
+  }
+
+  .group_footer {
+    clear: both;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #bbb;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .category {
+    border: 1px solid #9d9d9d;
+    margin-top: 30px;
+    margin-bottom: 16px;
+    min-height: 60px;
+  }
+
+  .category h3 {
+    margin: 0;
+    padding: 5px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #9d9d9d;
+  }
+
+  .question-enable-disable {
+    float: right;
+    width: 24px;
+  }
+
+  .question {
+    margin: 5px;
+    padding: 5px 8px 5px 5px;
+    border: dashed 1px #aaaaaa;
+    font-size: 1.2em;
+  }
+
+  .question > .left-box {
+    float: left;
+  }
+
+  .question > .right-box {
+    margin-left: 5px;
+    float: right;
+  }
+
+  .question > .questiontext {
+    overflow: hidden;
+  }
+
+  .question > .questiontext > textarea.editable-question {
+    width: 100%;
+    resize: none;
+    box-sizing: border-box;
+  }
+
+  .question-student {
+    border: none;
+  }
+
+  .ui-icon-grip-dotted-vertical {
+    -ms-transform: scale(1.8);
+    /* IE 9 */
+    -webkit-transform: scale(1.8);
+    /* Chrome, Safari, Opera */
+    transform: scale(1.8);
+  }
+
+  .remove-question {
+    float: right;
+  }
+
+  .editable-question-spacer {
+    width: 100%;
+  }
+
+  textarea.new-question {
+    width: 100%;
+    resize: vertical;
+  }
+
+  .ui-icon-trash {
+    -ms-transform: scale(1.2);
+    /* IE 9 */
+    -webkit-transform: scale(1.2);
+    /* Chrome, Safari, Opera */
+    transform: scale(1.2);
+  }
+
+  .disabled-predefined-question {
+    color: #b3b3b3;
+  }
+
+  .question_selection_help {
+    margin-top: 15px;
+  }
+
+  #group_selection_form {
+    margin-bottom: 20px;
+  }
+
+  [v-cloak] {
+    display: none;
+  }
+
+  #no_results {
+    margin-top: 20px;
+  }
+
+  #limit {
+    font-weight: bold;
+    padding-left: 8px;
+    div.notes {
+      font-weight: normal;
+    }
+  }
+
+  #inline-moderation {
+    margin-top: 10px;
+  }
+
+  #results_buttons {
+    padding-top: 20px;
+  }
+
+  .table-cell--center {
+    text-align: center;
+  }
+
+  .group_info {
+    margin: 5px 0;
+    padding: 5px 8px;
+  }
+
+  .group-border--bottom {
+    border-bottom: 1px dashed #bbb;
+  }
+
+  table.students_group {
+    width: 100%;
+    border-collapse: separate;
+  }
+
+  .student_name {
+    max-width: 10%;
+    width: 10%;
+  }
+
+  .scores {
+    text-align: center;
+    max-width: 5%;
+    width: 5%;
+  }
+
+  .comments {
+    max-width: 10%;
+    width: 10%;
+  }
+
+  .tab-content {
+    padding-left: 8px;
+  }
+
+  .highlight {
+    background-color: #f6e5ab;
+  }
+
+  .student_completed {
+    float: right;
+    font-weight: bold;
+  }
+
+  .student_sent {
+    float: right;
+  }
+
+  .notified_users {
+    margin: 10px 0px 10px 35px;
+    font-size: 14px;
+  }
+
+  notified_message .popover-content {
+    word-wrap: break-word;
+  }
+
+  td.has_score:after,
+  td.has_score:before {
+    content: "\00a0";
+  }
+
+  td.has_score:hover {
+    border-color: #9d9d9d;
+    cursor: pointer;
+  }
+
+  td.not_used {
+    text-decoration: line-through;
+  }
+
+  span.samplebox {
+    width: 20px;
+    height: 20px;
+  }
+
+  div#assignment_details,
+  div#student_responses_page {
+    padding-left: 8px;
+  }
+
+  .nav-pills {
+    margin-top: 24px;
+  }
+
+  .nav-pills > li.active > a,
+  .nav-pills > li.active > a:hover,
+  .nav-pills > li.active > a:focus {
+    background-color: transparent;
+    color: black;
+    font-weight: bold;
+  }
+
+  .nav-item {
+    border-right: 1px solid #d0d5d9;
+  }
+
+  .nav-item:last-child {
+    border-right: none;
+  }
+
+  .nav-item a {
+    color: #55595c;
+    padding: 2px 15px !important;
+  }
+
+  .nav-item.active a span {
+    padding-bottom: 2px;
+    border-bottom: 1px solid black;
+  }
+
+  .nav-link {
+    padding: 2px 15px !important;
+  }
+
+  table#notify {
+    margin-top: 20px;
+  }
+
+  table#notify tbody tr td {
+    border-top: none;
+  }
+
+  table#notify tbody tr td.to,
+  table#notify tbody tr td.subject,
+  table#notify tbody tr td.message {
+    width: 5%;
+  }
+
+  .to-content,
+  .subject-content,
+  .message-content {
+    width: 100%;
+    resize: vertical;
+  }
+
+  div#send_message_container {
+    margin: 10px 0px 10px 0px;
+  }
+
+  div#send_message_container > span {
+    padding-left: 10px;
+  }
+
+  div#search_container {
+    margin: 10px 0px 10px 0px;
+  }
+
+  div#search_container > span > input {
+    margin: 20px 0px 10px 0px;
+  }
+
+  #clear-attempts {
+    #search_container {
+      margin-top: 30px;
+    }
+
+    table.results {
+      width: 500px;
+
+      tbody {
+        tr > td {
+          padding-top: 4px;
+        }
+
+        tr:not(:last-child) > td {
+          padding-bottom: 4px;
+          border-bottom: 1px solid #d3d3d3;
+        }
+      }
+    }
+  }
+
+  #grade_integration {
+    select {
+      display: inline-block;
+      width: auto;
+    }
+  }
+
+  #grades,
+  #notify_students,
+  #clear_attempts {
+    h3 {
+      margin-bottom: 30px;
+    }
+
+    p:last-of-type {
+      margin-bottom: 30px;
+    }
+  }
+}

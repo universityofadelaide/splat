@@ -1,0 +1,78 @@
+// Copyright (C) 2018 The University of Adelaide
+// 
+// This file is part of SPLAT - Self & Peer Learning Assessment Tool.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SPLAT - Self & Peer Learning Assessment Tool is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SPLAT - Self & Peer Learning Assessment Tool.  If not, see <http://www.gnu.org/licenses/>.
+// 
+
+<%= render("shared/tabs") %>
+<div class="tab-content">
+  <div id="assignment_details" class="tab-pane fade in active">
+    <h1>Group Management</h1>
+    <div id="groupcategories">
+      <div class="flash-messages" v-cloak>
+        <div class="alert alert-danger" v-for="error in errors">{{ error }}</div>
+      </div>
+      <%= form_tag({ controller: "assignments", action: "set_groups" }, { id: "group_selection_form" }) do %>
+        <select v-model="selected" v-on:change="getGroupData" name="group_category_id">
+          <option selected disabled value="">Select a Group Set</option>
+          <option v-for="option in categories" v-bind:value="option.id">
+            {{ option.name }}
+          </option>
+        </select>
+      <%- end -%>
+      <div id="groups_panel" v-cloak>
+        <div id="groups_header" v-if="categories_data.length">
+          <span>Groups ({{ categories_data.length }})</span>
+          <div id="show_hide_all" v-on:click="toggleAll()" v-if="allExpanded()">Collapse All</div>
+          <div id="show_hide_all" v-on:click="toggleAll()" v-else>Expand All</div>
+        </div>
+        <ul id="groups_list" class="groups_list unstyled">
+          <li class="group" v-for="group in categories_data">
+            <div class="group_detail">
+              <div class="group_header" v-on:click="toggleMembers(group)">
+                <div class="indicator glyphicon" v-bind:class="[expanded(group.expanded) ? 'glyphicon-triangle-bottom' : 'glyphicon-triangle-right']"></div>
+                <span>{{ group.name }}</span>
+                <div class="member_count" v-if="group.members">{{ group.members.length }} members</div>
+              </div>
+              <div class="group_members" v-if="expanded(group.expanded)">
+                <ul class="group_members_list unstyled">
+                  <li class="group_member" v-for="member in group.members">
+                    <div class="group_member_name">{{ member.name }}</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <%= link_to("Previous", instruction_assignments_path, class: "btn btn-default") %>
+      <button type="button" class="btn btn-default button-float--right" v-bind:disabled="!save_and_complete" v-on:click="show_modal = true">Save & Complete</button>
+
+      <modal title="Import Groups" v-model="show_modal">
+        <div slot="default">
+          You are about to use the selected group set for creating this SPLAT assignment. Once confirmed, it cannot be changed.
+        </div>
+        <div slot="footer">
+          <button type="button" class="btn btn-default" v-on:click="show_modal = false">Cancel</button>
+          <button class="btn btn-default" v-on:click="submitForm()" v-bind:disabled="disable_confirm">Confirm</button>
+        </div>
+      </modal>
+
+    </div>
+    <%= render("group_categories/group_categories_vue") %>
+  </div>
+  <%= render("shared/no_results") %>  
+</div>
+
