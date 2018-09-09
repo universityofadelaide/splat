@@ -10,7 +10,7 @@ Under "config" you find a couple of "*_sample.yml" files. The "_sample" part has
 ### **app.yml**
 * "google_analytics" allows you to specify if you want to use Google Analytics and your individual ID.
 * "learner_banner" allows you to specify a piece of HTML that gets displayed in the right upper corner (learner role only).
-### **database.yml**
+### **database.yml** (only change this fie if you're not using the provided Vagrant configuration)
 * Allows you to configure your database per environment. The sample configuration is using MySQL / MariaDB.
 ### **secrets.yml**
 * Defines your LTI consumer key and secret to be used within Canvas. It also defines your "secret_key_base" which is used to identify the integrity of signed cookies.
