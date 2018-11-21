@@ -21,7 +21,7 @@ class Comment < ApplicationRecord
 
   has_paper_trail
 
-  belongs_to :from_user, { class_name: "User", foreign_key: "user_id" }
+  belongs_to :from_user, { class_name: "User", foreign_key: "user_id" } # rubocop:disable Rails/InverseOf
   belongs_to :assignment
   validates  :comments, { length: { maximum: 3000, too_long: "3000 characters is the maximum allowed" } }
 

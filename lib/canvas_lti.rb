@@ -107,20 +107,24 @@ module CanvasLti
     Rails.logger.debug("#{ sourcedid }: Resetting session launch status")
     # check that the consumer key is known
     return false unless check_consumer_key(controller.request.request_parameters[:oauth_consumer_key])
+
     Rails.logger.debug("#{ sourcedid }: Consumer key ok")
     authenticator = IMS::LTI::Services::MessageAuthenticator.new(r_url, r_params, @@credentials[controller.request.request_parameters[:oauth_consumer_key]])
 
     # Check if the signature is valid
     return false unless authenticator.valid_signature?
+
     Rails.logger.debug("#{ sourcedid }: valid authenticator signature")
 
     # check if the message is too old
-    return false if DateTime.strptime(controller.request.request_parameters[:oauth_timestamp], "%s") < 5.minutes.ago
+    return false if Time.strptime(controller.request.request_parameters[:oauth_timestamp], "%s") < 5.minutes.ago
+
     Rails.logger.debug("#{ sourcedid }: oauth timestamp ok")
 
     begin
       nonce = controller.request.request_parameters[:oauth_nonce]
       return false unless nonce
+
       # check if `params['oauth_nonce']` has already been used
       write_nonce(nonce)
     rescue NonceReused
@@ -154,7 +158,7 @@ module CanvasLti
   end
 
   def self.check_consumer_key(key)
-    return @@credentials.keys.include?(key)
+    return @@credentials.key?(key)
   end
 
   def self.authentication_failure_path
@@ -172,6 +176,7 @@ module CanvasLti
 
   def self.purge_nonces
     raise "WTF?" unless NONCE_DIR.to_s.include?("/nonce")
+
     FileUtils.rm_rf(NONCE_DIR)
   end
 
@@ -230,3 +235,5 @@ module CanvasLti
   # supply action to be called as before action in controllers
 
 end
+
+# rubocop:enable Style/ClassVars

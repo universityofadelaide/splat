@@ -21,8 +21,8 @@ class ProbeController < ActionController::Base
 
   def index
     public = "public"
-    render({ plain: "#{ Rails.application.class.parent.name } can not connect to database", status: 500 }) && return unless Question.first
-    render({ plain: "#{ Rails.application.class.parent.name } server not in pool",          status: 404 }) && return unless File.exist?(Rails.root.join(public, "probe.txt"))
+    render({ plain: "#{ Rails.application.class.parent.name } can not connect to database", status: :internal_server_error }) && return unless Question.first
+    render({ plain: "#{ Rails.application.class.parent.name } server not in pool",          status: :not_found }) && return unless File.exist?(Rails.root.join(public, "probe.txt"))
     render({ plain: "#{ Rails.application.class.parent.name } is operational" })
   end
 

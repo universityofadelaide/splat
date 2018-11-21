@@ -18,8 +18,8 @@
 
 FactoryBot.define do
   factory :group, { class: Group } do |f|
-    f.group_set_name	  { Faker::Hipster.sentence(3) }
-    f.name	            { Faker::Hipster.sentence(2) }
+    f.group_set_name    { Faker::Hipster.sentence(3) }
+    f.name              { Faker::Hipster.sentence(2) }
     f.sequence(:lms_id) { |n| FactoryBot.create(:lms_id) + n.to_s } # when we make an API calls from LTI to LMS this would be used.
 
     trait :with_users do

@@ -44,8 +44,10 @@ class CanvasAssignment
     updates = []
     student_grades.each do |student, submission|
       next if submission[:score].nil?
+
       user = User.find_by({ lms_id: student })
       next if user.nil?
+
       begin
         paf = @paf_calculator.calculate(user.id, true)
       rescue PafError
@@ -53,6 +55,7 @@ class CanvasAssignment
       end
       grade = _calculate_grade(grading_data, grading_schema, paf, submission[:score])
       next if grade.nil?
+
       updates << { student_id: submission[:user_id], grade: grade }
     end
     blank_user = student_ids - updates.pluck(:student_id)
@@ -104,6 +107,7 @@ class CanvasAssignment
   #   value: submission details
   def _organise_assignment_submissions_by_student(assignment_submissions: nil)
     raise ArgumentError, "assignment_submissions cannot be nil" unless assignment_submissions
+
     # collect interesting fields for an submission and group submissions by student
     grade_cols = %i[sis_user_id user_id assignment_id score grade attempt workflow_state]
     student_submissions = assignment_submissions.map { |s| s.slice(*grade_cols) }
@@ -116,6 +120,7 @@ class CanvasAssignment
   # order on "attempt" and looking for the first one that is graded
   def _latest_graded(assignment_id: nil, submissions: [])
     raise ArgumentError, "assignment_id must be provided" if assignment_id.blank?
+
     sorted_submissions = submissions.select { |s| s[:assignment_id].to_s == assignment_id }.sort_by { |submission| -submission[:attempt].to_i }
     latest_submission = sorted_submissions.find do |s|
       Rails.logger.debug("skipping ungraded submission #{ s.inspect }") unless s[:workflow_state] == "graded"
@@ -148,7 +153,7 @@ class CanvasAssignment
     # but I think it's better to check course first in case a lecturer has defined its own standard.
     begin
       schema = @canvas_service.get_grading_standard_course(id, @course_id)
-    rescue
+    rescue StandardError
       begin
         schema = @canvas_service.get_grading_standard_account(id)
       rescue StandardError => e
@@ -161,6 +166,7 @@ class CanvasAssignment
 
   def _get_grading_standard_id(assignment)
     return nil unless assignment[:grading_type] == LETTER_GRADE
+
     # if the assignment doesn't override the grading schema it's nil
     grading_standard_id = assignment[:grading_standard_id]
     # fallback to course setting, we set an account grading schema by default

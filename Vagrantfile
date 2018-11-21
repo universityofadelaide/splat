@@ -1,9 +1,8 @@
-
 Vagrant.configure(2) do |config|
   config.ssh.forward_agent = true
 
-  config.vm.box = "centos/7"
-  config.vm.box_version = "1804.02"
+  config.vm.box = "bento/centos-7.5"
+  config.vm.box_version = "201808.24.0"
   config.vm.provision :shell, { path: "vagrant/bootstrap_root.sh" }
   config.vm.provision :shell, { path: "vagrant/bootstrap_user.sh", privileged: false, args: [ENV["USER"]] }
   config.vm.provision :shell, { path: "vagrant/startup.sh", privileged: false, run: "always" }

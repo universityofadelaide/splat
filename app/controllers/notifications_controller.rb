@@ -41,14 +41,14 @@ class NotificationsController < ApplicationController
     end
     if response.status == 200
       new_notification = _add_notifications(recipients_lms_ids, subject, body)
-      render({ json: new_notification.to_json, status: 200 })
+      render({ json: new_notification.to_json, status: :ok })
     end
   rescue ActiveRecord::RecordInvalid => e
     logger.error(e.inspect)
     flash[:danger] = "An error occurred when saving notifications"
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def search_students

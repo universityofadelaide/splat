@@ -34,9 +34,11 @@ class PAFCalculator
   # This method collects paf score for a student
   def calculate(user_id, only_used_scores=false)
     return nil if question_count.zero?
+
     user_id = user_id.to_i
     group = lookup[:groups][:user_group][user_id]
     raise(PafError, "user_id '#{ user_id }' not part of PAF assignment") if group.nil?
+
     user_count = lookup[:groups][:group_users][group].size # count no of users of a group
     responses = lookup[:responses][user_id] # collect responses for the current assignment for a user
     sum_responses = 0

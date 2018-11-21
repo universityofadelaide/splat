@@ -27,31 +27,29 @@ class GroupsLtiImporter
 
   def import
     ActiveRecord::Base.transaction do
-      begin
-        @data.each do |group, members|
-          group.assign_attributes({ created_by: @app_user, updated_by: @app_user })
-          group.save
-          @assignment.groups << group
-          members.each do |member|
-            member_found = User.find_by({ lms_id: member[:lms_id] })
-            if member_found
-              member_found.assign_attributes({ first_name: member[:first_name], last_name: member[:last_name] })
-              if member_found.changed?
-                member_found.assign_attributes({ updated_by: @app_user })
-                member_found.save
-              end
-              member = member_found
-            else
-              member.assign_attributes({ created_by: @app_user, updated_by: @app_user })
-              member.save
+      @data.each do |group, members|
+        group.assign_attributes({ created_by: @app_user, updated_by: @app_user })
+        group.save
+        @assignment.groups << group
+        members.each do |member|
+          member_found = User.find_by({ lms_id: member[:lms_id] })
+          if member_found
+            member_found.assign_attributes({ first_name: member[:first_name], last_name: member[:last_name] })
+            if member_found.changed?
+              member_found.assign_attributes({ updated_by: @app_user })
+              member_found.save
             end
-            member.groups << group
-            @assignment.users << member
+            member = member_found
+          else
+            member.assign_attributes({ created_by: @app_user, updated_by: @app_user })
+            member.save
           end
+          member.groups << group
+          @assignment.users << member
         end
-      rescue
-        raise(GroupsLtiImporterPersistError, "An error occurred importing the Groups and Users")
       end
+    rescue StandardError
+      raise(GroupsLtiImporterPersistError, "An error occurred importing the Groups and Users")
     end
   end
 

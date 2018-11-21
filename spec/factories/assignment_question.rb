@@ -19,6 +19,6 @@
 FactoryBot.define do
   factory :assignment_question, { class: AssignmentQuestion } do |f|
     f.assignment { FactoryBot.create(:assignment) }
-    f.question 	 { FactoryBot.create(:question) }
+    f.question { FactoryBot.create(:question) }
   end
 end

@@ -49,6 +49,7 @@ class SAPACalculator
     lookup[:responses][user_id]&.each do |from_id, response|
       next if user_id == from_id
       next unless !only_used_scores || response[:used]
+
       has_others_scores = true
       sum_others_scores += response[:score]
       responder_count += 1

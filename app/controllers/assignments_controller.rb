@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
     end
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def show
@@ -59,11 +59,12 @@ class AssignmentsController < ApplicationController
     @source_assignment = "" unless @course_assignments&.find { |a| a[:id].to_s == @source_assignment }
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def inline_moderation_data
     raise "Access denied: No Instructor" unless helpers.instructor?(session[:roles])
+
     response = @assignment.to_json
     respond_to do |format|
       format.json { render({ json: response }) }
@@ -71,7 +72,7 @@ class AssignmentsController < ApplicationController
   rescue StandardError => e
     logger.error(e.inspect)
     respond_to do |format|
-      format.json { render({ json: { error: e.message }, status: 401 }) }
+      format.json { render({ json: { error: e.message }, status: :unauthorized }) }
     end
   end
 
@@ -86,13 +87,13 @@ class AssignmentsController < ApplicationController
     flash[:danger] = "Error during save: #{ e.message }"
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def preview
-  rescue
+  rescue StandardError
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   # Sets the groups and users for the assignment.
@@ -120,7 +121,7 @@ class AssignmentsController < ApplicationController
     end
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def export_csv
@@ -132,12 +133,13 @@ class AssignmentsController < ApplicationController
     end
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def gradebook_integration
     no_access("AssignmentController#gradebook_integration not instructor") && return unless helpers.instructor?(session[:roles])
     raise "No assignment selected" if !params.key?("assignment_id") && params["assignment_id"].empty?
+
     ca = CanvasAssignment.new(session[:course_id], params["assignment_id"], PAFCalculator.new(@assignment), canvas_service)
     ca.apply_paf_grades(session[:canvas_assignment_id]) # Canvas Assignment ID
     @assignment.source_assignment_id = params["assignment_id"]
@@ -148,11 +150,11 @@ class AssignmentsController < ApplicationController
     end
   rescue UnsupportedGradeTypeError => e
     respond_to do |format|
-      format.json { render({ json: { error: e.message }, status: 501 }) }
+      format.json { render({ json: { error: e.message }, status: :not_implemented }) }
     end
   rescue StandardError => e
     respond_to do |format|
-      format.json { render({ json: { error: e.message }, status: 500 }) }
+      format.json { render({ json: { error: e.message }, status: :internal_server_error }) }
     end
   end
 
