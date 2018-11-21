@@ -34,7 +34,7 @@ class GroupCategoriesController < ApplicationController
     group_category_id = params[:id]
     if !_group_category_id_valid?(group_category_id)
       respond_to do |format|
-        format.json { render({ json: "Invalid group category for course #{ session[:course_id] }", status: 500 }) }
+        format.json { render({ json: "Invalid group category for course #{ session[:course_id] }", status: :internal_server_error }) }
       end
       logger.error("Invalid group category for course #{ session[:course_id] }")
       return

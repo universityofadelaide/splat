@@ -36,6 +36,7 @@ module ApplicationHelper
 
   def instructor?(roles)
     return false unless roles
+
     roles_array = roles.split(",")
 
     roles_array.each do |role|
@@ -47,6 +48,7 @@ module ApplicationHelper
 
   def learner?(roles)
     return false unless roles
+
     roles_array = roles.split(",")
 
     roles_array.each do |role|
@@ -58,6 +60,7 @@ module ApplicationHelper
 
   def responses?(assignment)
     return nil unless assignment
+
     user = User.find_by({ lms_id: session[:current_user] })
     return assignment.responses.find_by({ from_user_id: user.id })
   end

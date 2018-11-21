@@ -20,7 +20,7 @@
 class ApplicationController < CanvasLti::CanvasLtiApplicationController
 
   protect_from_forgery({ with: :exception })
-  skip_before_action :verify_authenticity_token, { only: [:launch] }
+  skip_before_action :verify_authenticity_token, { only: [:launch] } # rubocop:disable Rails/LexicallyScopedActionFilter
   before_action :init_assignment
   before_action :set_current_user
 
@@ -95,6 +95,7 @@ class ApplicationController < CanvasLti::CanvasLtiApplicationController
       missing << parameter unless lti_params[parameter]
     end
     return true if missing.blank?
+
     # if we get here there is missing params
     logger.error "LTI launch attempted with the following parameters missing: #{ missing }, Nothing good can come of this"
     bad_request && return

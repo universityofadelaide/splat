@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   cattr_accessor :current_user_id
 
-  has_many :group_users, { class_name: "GroupUser" }
+  has_many :group_users, { class_name: "GroupUser" } # rubocop:disable Rails/HasManyOrHasOneDependent
   has_many :groups, { through: :group_users }
   has_many :assignments, { through: :assignment_users }
 
@@ -32,9 +32,11 @@ class User < ApplicationRecord
   # This method will return all the peers of the loggned in user's group for that assignment
   def assignment_group(assignment)
     return nil if assignment.blank?
+
     user_group = self.groups.merge(assignment.groups)
     return nil if user_group.count.zero?
     raise "User is in multiple groups on assignment #{ assignment.name } id #{ assignment.id }" unless user_group.count == 1
+
     return user_group.first
   end
 

@@ -23,14 +23,14 @@ class Assignment < ApplicationRecord
 
   CSV_UNUSED_FLAG = " (e)".freeze
 
-  has_many :assignment_groups
+  has_many :assignment_groups # rubocop:disable Rails/HasManyOrHasOneDependent
   has_many :groups, { through: :assignment_groups }
-  has_many :assignment_users
+  has_many :assignment_users # rubocop:disable Rails/HasManyOrHasOneDependent
   has_many :users, { through: :assignment_users }
-  has_many :assignment_questions
-  has_many :questions
-  has_many :responses
-  has_many :messages
+  has_many :assignment_questions # rubocop:disable Rails/HasManyOrHasOneDependent
+  has_many :questions # rubocop:disable Rails/HasManyOrHasOneDependent
+  has_many :responses # rubocop:disable Rails/HasManyOrHasOneDependent
+  has_many :messages # rubocop:disable Rails/HasManyOrHasOneDependent
 
   validates :name, :lms_id, { presence: true }
   validates :instructions, { length: { maximum: 5000, too_long: "5000 characters is the maximum allowed" } }
@@ -56,18 +56,14 @@ class Assignment < ApplicationRecord
 
   def update_questions(updated_question_data)
     categorised_questions = JSON.parse(updated_question_data)
-    unless _enabled_questions?(categorised_questions)
-      raise "Please make sure you have at least one question created or selected for this assignment."
-    end
+    raise "Please make sure you have at least one question created or selected for this assignment." unless _enabled_questions?(categorised_questions)
 
     ActiveRecord::Base.transaction do
-      begin
-        # clear the positions; also get the retained questions and delete the rest. predefined questions are always retained
-        delete_ids = _prepare_to_update_questions(categorised_questions)
-        logger.info("deleting #{ delete_ids.size } old questions")
-        Question.where({ id: delete_ids }).destroy_all if delete_ids.size
-        _update_retained_questions(categorised_questions)
-      end
+      # clear the positions; also get the retained questions and delete the rest. predefined questions are always retained
+      delete_ids = _prepare_to_update_questions(categorised_questions)
+      logger.info("deleting #{ delete_ids.size } old questions")
+      Question.where({ id: delete_ids }).destroy_all if delete_ids.size
+      _update_retained_questions(categorised_questions)
     end
   end
 
@@ -140,6 +136,7 @@ class Assignment < ApplicationRecord
   # Calculates a list of all student responses, sum of all question scores used
   def responses_data(force=false)
     return @responses_data if !force && @responses_data
+
     data = {}
     extract = responses.all.pluck(:from_user_id, :for_user_id, :score, :score_used)
     extract.each do |from, to, score, used|
@@ -193,6 +190,7 @@ class Assignment < ApplicationRecord
     not_responded_users_lms_ids.each do |lms_id|
       user = users.find_by({ lms_id: lms_id })
       next unless user
+
       group = user.assignment_group(assignment)
       user_data <<
         {
@@ -224,11 +222,9 @@ class Assignment < ApplicationRecord
   def clear_responses(user_id)
     logger.info("Deleting responses for user #{ user_id } on assignment #{ self.id }")
     ActiveRecord::Base.transaction do
-      begin
-        responses.where({ from_user_id: user_id })&.destroy_all
-        Comment.find_by({ user_id: user_id, assignment_id: self.id })&.destroy
-        logger.info("Deleted responses for user #{ user_id } on assignment #{ self.id }")
-      end
+      responses.where({ from_user_id: user_id })&.destroy_all
+      Comment.find_by({ user_id: user_id, assignment_id: self.id })&.destroy
+      logger.info("Deleted responses for user #{ user_id } on assignment #{ self.id }")
     end
   end
 
@@ -321,6 +317,7 @@ class Assignment < ApplicationRecord
     categorised_questions.each do |_, updated_questions|
       updated_questions.each do |updated_question|
         next unless updated_question["id"]
+
         question = Question.find_by({ id: updated_question["id"] })
         question.update({ position: nil })
         keep_ids << updated_question["id"]
@@ -362,6 +359,7 @@ class Assignment < ApplicationRecord
     notifications = Notification.where({ message_id: message_id })
     notifications.each do |n|
       next unless n
+
       notified_users << users.where({ id: n.user_id }).pluck(:first_name, :last_name).join(" ")
     end
     return notified_users

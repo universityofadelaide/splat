@@ -131,7 +131,7 @@ class BaseMigration < ActiveRecord::Migration[5.1]
     end
 
     unless table_exists?(:question_templates)
-      create_table "question_templates", { force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" } do |t|
+      create_table "question_templates", { force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" } do |t| # rubocop:disable Rails/CreateTableWithTimestamps
         t.integer "question_category_id"
         t.string "question_text"
         t.integer "position"

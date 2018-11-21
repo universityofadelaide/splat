@@ -225,17 +225,16 @@ class CanvasService
   def _response_body_json(response)
     body = response.body
     return JSON.parse(body, { symbolize_names: true }) unless body.empty?
+
     return {}
   end
 
   def _make_request(params, max_retries=DEFAULT_MAX_RETRIES)
     max_retries.times do
-      begin
-        return RestClient::Request.execute(params)
-      rescue RestClient::ExceptionWithResponse => e
-        @controller.helpers.log_error(Logger::ERROR, e)
-        raise e if e.instance_of?(RestClient::NotFound)
-      end
+      return RestClient::Request.execute(params)
+    rescue RestClient::ExceptionWithResponse => e
+      @controller.helpers.log_error(Logger::ERROR, e)
+      raise e if e.instance_of?(RestClient::NotFound)
     end
     return RestClient::Request.execute(params)
   end

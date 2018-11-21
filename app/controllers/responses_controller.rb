@@ -23,7 +23,7 @@ class ResponsesController < ApplicationController
     no_access && return unless helpers.learner?(session[:roles])
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def new
@@ -33,7 +33,7 @@ class ResponsesController < ApplicationController
     @questions = @assignment.questions.active.sorted
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def create
@@ -64,7 +64,7 @@ class ResponsesController < ApplicationController
     end
   rescue StandardError => e
     logger.error(e.inspect)
-    render({ file: Rails.root.join("public", "500.html"), status: 500 })
+    render({ file: Rails.root.join("public", "500.html"), status: :internal_server_error })
   end
 
   def score
@@ -85,7 +85,7 @@ class ResponsesController < ApplicationController
   rescue StandardError => e
     logger.error(e.inspect)
     respond_to do |format|
-      format.json { render({ json: params, message: e.message, status: 500 }) }
+      format.json { render({ json: params, message: e.message, status: :internal_server_error }) }
     end
   end
 
@@ -114,7 +114,7 @@ class ResponsesController < ApplicationController
   rescue StandardError => e
     logger.error(e.inspect)
     respond_to do |format|
-      format.json { render({ json: params, message: e.message, status: 500 }) }
+      format.json { render({ json: params, message: e.message, status: :internal_server_error }) }
     end
   end
 
@@ -145,9 +145,7 @@ class ResponsesController < ApplicationController
           total += score.to_i
         end
       end
-      unless total == 100
-        @errors << "Total score for '#{ question.question_text }' is #{ total || 0 } but should be 100"
-      end
+      @errors << "Total score for '#{ question.question_text }' is #{ total || 0 } but should be 100" unless total == 100
     end
     raise ResponseException unless @errors.count.zero?
   end

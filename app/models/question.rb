@@ -21,12 +21,12 @@ class Question < ApplicationRecord
 
   belongs_to :question_category
   belongs_to :assignment
-  has_many :responses
+  has_many :responses # rubocop:disable Rails/HasManyOrHasOneDependent
 
   validates :question_text, { length: { minimum: 10, maximum: 1000 } }
   validates :position, { presence: true, uniqueness: { scope: %i[assignment question_category] }, allow_nil: true }
 
-  scope :sorted, ->() { order("questions.assignment_id ASC, questions.position ASC") }
-  scope :active, ->() { where("questions.enabled = ? or questions.predefined = ?", 1, 0) }
+  scope :sorted, -> { order("questions.assignment_id ASC, questions.position ASC") }
+  scope :active, -> { where("questions.enabled = ? or questions.predefined = ?", 1, 0) }
 
 end

@@ -23,7 +23,7 @@ class GroupsController < ApplicationController
     group_id = params[:id]
     if !_group_id_valid?(group_id)
       respond_to do |format|
-        format.json { render({ json: "Invalid group '#{ group_id }' for course #{ session[:course_id] }", status: 500 }) }
+        format.json { render({ json: "Invalid group '#{ group_id }' for course #{ session[:course_id] }", status: :internal_server_error }) }
       end
       logger.error("Invalid group '#{ group_id }' for course #{ session[:course_id] }. Groups: #{ session[:groups].flatten.inspect }")
       return

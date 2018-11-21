@@ -21,8 +21,8 @@ class Response < ApplicationRecord
 
   has_paper_trail
 
-  belongs_to :from_user, { class_name: "User", foreign_key: "from_user_id" }
-  belongs_to :for_user, { class_name: "User", foreign_key: "for_user_id" }
+  belongs_to :from_user, { class_name: "User", foreign_key: "from_user_id" } # rubocop:disable Rails/InverseOf
+  belongs_to :for_user, { class_name: "User", foreign_key: "for_user_id" } # rubocop:disable Rails/InverseOf
   belongs_to :question
   belongs_to :assignment
 

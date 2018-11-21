@@ -19,6 +19,6 @@
 FactoryBot.define do
   factory :group_user, { class: GroupUser } do |f|
     f.group { FactoryBot.create(:group) }
-    f.user 	{ FactoryBot.create(:user) }
+    f.user { FactoryBot.create(:user) }
   end
 end

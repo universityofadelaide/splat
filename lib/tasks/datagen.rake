@@ -39,14 +39,14 @@ namespace :datagen do
   def add_questions_and_generate_score_for_assignment(assignment)
     raise "No assignment found to insert data into" if assignment.nil?
     raise "No questions in the assignment" if assignment.questions.count.zero?
+
     if assignment.groups.empty?
       puts "Please import the csv data file to provide the groups and users for this assignment"
       puts "When done, please rerun this task"
       raise "No groups imported yet"
     end
-    if !assignment.responses.empty?
-      raise "Scores are already entered for this assignment. Please run the data delete task and try again"
-    end
+    raise "Scores are already entered for this assignment. Please run the data delete task and try again" if !assignment.responses.empty?
+
     generate_peer_scores assignment
   end
   COMMENTS = ["An excellent assignment, thank you.", "This is a test", nil].freeze
@@ -81,9 +81,7 @@ namespace :datagen do
             r.for_user = recipient
             r.score = score
             r.assignment = assignment
-            if r.save == false
-              throw "Error saving response: #{ r.errors.full_messages }"
-            end
+            throw "Error saving response: #{ r.errors.full_messages }" if r.save == false
           end
         end
       end

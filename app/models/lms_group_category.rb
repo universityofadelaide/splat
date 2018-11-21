@@ -31,6 +31,7 @@ class LmsGroupCategory
     groups.each do |group_hash|
       users = @canvas_service.get_users(group_hash[:id])
       next if users.blank?
+
       group = Group.new({ lms_id: group_hash[:id], group_set_name: group_category[:name], name: group_hash[:name] })
       data[group] = []
       users.each do |member_hash|
@@ -40,6 +41,7 @@ class LmsGroupCategory
       end
     end
     raise(GroupsLtiImporterPersistError, "All groups are empty") if data.empty?
+
     return data
   end
 

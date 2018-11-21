@@ -18,8 +18,8 @@
 
 FactoryBot.define do
   factory :question, { class: Question } do |f|
-    f.question_text 	  { Faker::Hipster.sentence(3) }
-    f.position        	{ Faker::Number.number(4) }
+    f.question_text     { Faker::Hipster.sentence(3) }
+    f.position          { Faker::Number.number(4) }
     f.question_category { FactoryBot.create(:question_category) }
     f.assignment        { FactoryBot.create(:assignment) }
     f.predefined        { true }

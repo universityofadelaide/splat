@@ -19,9 +19,9 @@
 # model which represents the groups which are imported from CSV
 class Group < ApplicationRecord
 
-  has_many :group_users, { class_name: "GroupUser" }
+  has_many :group_users, { class_name: "GroupUser" } # rubocop:disable Rails/HasManyOrHasOneDependent
   has_many :users, { through: :group_users }
-  has_one  :assignment_groups, { class_name: "AssignmentGroup" }
+  has_one  :assignment_groups, { class_name: "AssignmentGroup" } # rubocop:disable Rails/HasManyOrHasOneDependent
   has_one  :assignment, { through: :assignment_groups }
 
   validates :name, :group_set_name, :lms_id, { presence: true }

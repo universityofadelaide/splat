@@ -1,7 +1,7 @@
 # SPLAT - Self & Peer Learning Assessment Tool
 
 ## Requirements
-* Ruby 2.4.2
+* Ruby 2.5.1
 * MySQL / MariaDB
 * Canvas LMS
 
